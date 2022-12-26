@@ -35,5 +35,5 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
-./SpaceBattle.Lib.Test/workflows/codecov.exe
-./SpaceBattle.Lib.Test/workflows/codecov_reports.txt
+*.codecov.exe
+*.codecov_reports.txt
