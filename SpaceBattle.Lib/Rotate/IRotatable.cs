@@ -1,5 +1,5 @@
 namespace SpaceBattle.Lib;
-using Angles
+using Angles;
 
 public interface IRotatable
 {
