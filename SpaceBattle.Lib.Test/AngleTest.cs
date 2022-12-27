@@ -45,10 +45,10 @@ public class AngleTest
     }
     
     [Fact]
-    public void SuccesfullWorkMethodNOD()
+    public void SuccesfullWorkMethodGCD()
     {
-        int nod = Angle.NOD(4, 5);
-        Assert.Equal(1, nod);
+        int gcd = Angle.GCD(4, 5);
+        Assert.Equal(1, gcd);
     }
     
     [Fact]
