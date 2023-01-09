@@ -12,11 +12,11 @@ public class Angle
             throw new Exception();
         }
 
-        int nod = GCD(numerator,denominator);
-        this.Numerator = numerator / nod;
-        this.Denominator = denominator / nod;
+        int gcd = GCD(numerator,denominator);
+        this.Numerator = numerator / gcd;
+        this.Denominator = denominator / gcd;
     }
-    public static int GCD(int x,int y)
+    private static int GCD(int x,int y)
     {
         while (x != y)
             {
@@ -32,8 +32,8 @@ public class Angle
     {
         int num = a.Numerator * b.Denominator + b.Numerator * a.Denominator;
         int den = a.Denominator * b.Denominator;
-        int nod = GCD(num, den);
-        return new Angle(num/nod , den/nod);
+        int gcd = GCD(num, den);
+        return new Angle(num/gcd , den/gcd);
     }
 
     public static bool operator ==(Angle a, Angle b) => (a.Numerator == b.Numerator) && (a.Denominator == b.Denominator);
