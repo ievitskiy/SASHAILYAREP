@@ -16,7 +16,7 @@ public class Angle
         this.Numerator = numerator / gcd;
         this.Denominator = denominator / gcd;
     }
-    private static int GCD(int x,int y)
+    public static int GCD(int x,int y)
     {
         while (x != y)
             {

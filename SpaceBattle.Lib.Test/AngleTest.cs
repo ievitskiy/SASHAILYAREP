@@ -45,6 +45,13 @@ public class AngleTest
     }
     
     [Fact]
+    public void SuccesfullWorkMethodGCD()
+    {
+        int gcd = Angle.GCD(4, 5);
+        Assert.Equal(1, gcd);
+    }
+    
+    [Fact]
     public void NotSuccesfullEqual()
     {
         Angle a = new Angle(45, 1);
