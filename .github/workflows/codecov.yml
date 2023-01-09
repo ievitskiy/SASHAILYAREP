@@ -1,28 +1,40 @@
-name: dotnet package
- 
-on: [workflow_dispatch, pull_request]
- 
+name: .NET
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "The reason for running the workflow"
+        required: true
+        default: "Manual run"
+
+  #pull_request:
+  #branches: [ "main" ]
+
 jobs:
   build:
- 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: ['6.0.x' ]
- 
+
     steps:
       - uses: actions/checkout@v3
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v2
+      - name: "Print manual run reason"
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo 'Reason: ${{ github.event.inputs.reason }}'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Install dependencies
+          dotnet-version: 6.0.x
+      - name: Get dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --no-restore /p:ContinuousIntegrationBuild=true
+        run: dotnet build --configuration Release --no-restore
+      - name: Setup cov env
+        run: dotnet tool install --global dotnet-coverage
       - name: Test
-        run: dotnet test --no-build --verbosity d -p:CollectCoverage=true -p:CoverletOutput=./coverage/coverage.opencover.xml -p:CoverletOutputFormat=opencover
+        run: dotnet-coverage collect 'dotnet test' -f xml  -o 'coverage.xml'
       - name: Codecov
         uses: codecov/codecov-action@v3
         with: 
-          files: SpaceBattle.Lib.Test/coverage/coverage.opencover.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          
