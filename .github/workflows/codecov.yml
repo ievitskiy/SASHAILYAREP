@@ -1,7 +1,4 @@
 name: dotnet package
-
-ignore:
-  ["SpaceBattle.Lib.Test"]
  
 on: [workflow_dispatch, pull_request, push]
 jobs:
