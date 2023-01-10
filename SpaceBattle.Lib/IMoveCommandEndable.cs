@@ -2,7 +2,7 @@
 
 public interface IMoveCommandEndable
 {
-    IUObject UObject { get; }
+    IUObject Object { get; }
     ICommand MoveCommand { get; }
     IQueue<ICommand> Queue { get; }
 }
