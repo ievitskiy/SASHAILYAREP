@@ -1,69 +1,65 @@
-using Hwdtech.Ioc;
-using Hwdtech;
-
+using Xunit;
 using Moq;
+using Hwdtech;
+using Hwdtech.Ioc;
 
 namespace SpaceBattle.Lib.Test;
 
-public class DetectCollisionCommandTests
+public class CheckCollisionTest
 {
-    public DetectCollisionCommandTests()
+    Mock<IStrategy> mockCheckCollisionStrategy = new Mock<IStrategy>();
+    public CheckCollisionTest()
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
-
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+
+        var getPropertyStrategy = new GetPropertyStrategy();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetProperty", (object[] args) => getPropertyStrategy.Execute(args)).Execute();
+
+        var getDifferenceStrategy = new GetDifferenceStrategy();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetDifference", (object[] args) => getDifferenceStrategy.Execute(args)).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.CheckCollision", (object[] args) => mockCheckCollisionStrategy.Object.Execute(args)).Execute();
     }
 
-    [Fact]
-    public void SuccesfulDetectCollisionCommandTests()
-    {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
 
+    [Fact]
+    public void CollisionCheckTest()
+    {
         var obj1 = new Mock<IUObject>();
         var obj2 = new Mock<IUObject>();
 
-        var mockCommand = new Mock<SpaceBattle.Lib.ICommand>();
-        mockCommand.Setup(x => x.Execute());
+        obj1.Setup(x => x.getProperty("position")).Returns(new Vector(It.IsAny<int>(), It.IsAny<int>()));
+        obj2.Setup(x => x.getProperty("position")).Returns(new Vector(It.IsAny<int>(), It.IsAny<int>()));
+        obj1.Setup(x => x.getProperty("velocity")).Returns(new Vector(It.IsAny<int>(), It.IsAny<int>()));
+        obj2.Setup(x => x.getProperty("velocity")).Returns(new Vector(It.IsAny<int>(), It.IsAny<int>()));
 
-        var mockStrategyReturnsCommand = new Mock<IStrategy>();
-        mockStrategyReturnsCommand.Setup(x => x.Execute(obj1.Object, obj2.Object)).Returns(mockCommand.Object).Verifiable();
+        mockCheckCollisionStrategy.Setup(x => x.Execute(It.IsAny<object[]>())).Returns(true).Verifiable();
+        var checkCollision = new CheckCollision(obj1.Object, obj2.Object);
 
-        var mockDict = new Mock<IDictionary<int, object>>();
-        mockDict.Setup(d => d.Keys).Returns(new List<int>(){1});
+        Assert.Throws<Exception>(() => checkCollision.Execute());
+        mockCheckCollisionStrategy.Verify();
 
-        var mockStrategyReturnsTree = new Mock<IStrategy>();
-        mockStrategyReturnsTree.Setup(x => x.Execute()).Returns(mockDict.Object).Verifiable();
 
-        var mockStrategyReturnsList = new Mock<IStrategy>();
-        mockStrategyReturnsList.Setup(x => x.Execute(It.IsAny<object[]>())).Returns(new List<int>()).Verifiable();
+        mockCheckCollisionStrategy.Setup(x => x.Execute(It.IsAny<object[]>())).Returns(false).Verifiable();
+        var checkCollisionFalse = new CheckCollision(obj1.Object, obj2.Object);
+        checkCollisionFalse.Execute();
 
-        var mockStrategyReturnsCorrentList = new Mock<IStrategy>();
-        mockStrategyReturnsCorrentList.Setup(x => x.Execute(It.IsAny<object[]>())).Returns(new List<int>()).Verifiable();
-
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetSolutionTree", (object[] args) => mockStrategyReturnsTree.Object.Execute(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.UnionPropertiesForCollision", (object[] args) => mockStrategyReturnsList.Object.Execute(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Collision", (object[] args) => mockStrategyReturnsCommand.Object.Execute(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.PrepareDataToCollision", (object[] args) => mockStrategyReturnsCorrentList.Object.Execute(args)).Execute();
-
-        ICommand IsCollision = new DetectCollisionCommand(obj1.Object, obj2.Object);
-
-        IsCollision.Execute();
-        
-        mockStrategyReturnsCorrentList.VerifyAll();
-        mockStrategyReturnsCommand.VerifyAll();
-        mockStrategyReturnsList.VerifyAll();
-        mockStrategyReturnsTree.VerifyAll();
+        mockCheckCollisionStrategy.Verify();
     }
 
     [Fact]
-    public void SuccesfulPrepareDataToCollisionStrategyTest()
+    public void GetDiffTest()
     {
-        List<int> property1 = new List<int>(){12, 32, 56, 4};
-        List<int> property2 = new List<int>(){12, 32, 56, 4};
+        var obj1 = new Mock<IUObject>();
+        var obj2 = new Mock<IUObject>();
 
-        IStrategy PrepareData = new PrepareDataToCollisionStrategy();
+        obj1.Setup(x => x.getProperty("position")).Returns(new Vector(1, 1));
+        obj2.Setup(x => x.getProperty("position")).Returns(new Vector(2, 2));
+        obj1.Setup(x => x.getProperty("velocity")).Returns(new Vector(1, 1));
+        obj2.Setup(x => x.getProperty("velocity")).Returns(new Vector(2, 2));
 
-        Object.Equals(new List<int>(){0, 0, 0, 0}, PrepareData.Execute(property1,property2));
+        var getDifferenceStrategy = new GetDifferenceStrategy();
+        Assert.Equal(new List<Vector>{new Vector(-1,-1), new Vector(-1,-1)},getDifferenceStrategy.Execute(obj1.Object, obj2.Object));
     }
 }

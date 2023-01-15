@@ -1,11 +1,10 @@
 namespace SpaceBattle.Lib;
-
 public class GetPropertyStrategy : IStrategy
 {
     public object Execute(params object[] args)
     {
-        var obj = (IUObject) args[0];
-        var key = (string) args[1];
-        return obj.getProperty(key);
+        string property = (string)args[0];
+        IUObject obj = (IUObject)args[1];
+        return obj.getProperty(property);
     }
 }
