@@ -22,7 +22,6 @@ public class CheckCollisionTest
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.CheckCollision", (object[] args) => mockCheckCollisionStrategy.Object.Execute(args)).Execute();
     }
 
-
     [Fact]
     public void CollisionCheckTest()
     {
