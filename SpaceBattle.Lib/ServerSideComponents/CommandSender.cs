@@ -15,7 +15,7 @@ namespace SpaceBattle.ServerSide
 
         public void Execute()
         {
-            sender.Send(command);
+            sender.Push(command);
         }
     }
 }
