@@ -1,6 +1,7 @@
-namespace SpaceBattle.Lib.Interfaces;
-
-public interface ICommand
+namespace SpaceBattle.Interfaces
 {
-    public void Execute();
+    public interface ICommand
+    {
+        public void Execute();
+    }
 }
