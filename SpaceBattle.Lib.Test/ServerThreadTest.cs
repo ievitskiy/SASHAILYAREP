@@ -188,6 +188,21 @@ namespace SpaceBattle.Lib.Test
             Assert.False(th10.GetStop());
             Assert.False(th8.GetStop());
         }
-        
+        [Fact(Timeout = 1500)]
+        public void HardStopCommandWithoutAction()
+        {
+            var th6 = IoC.Resolve<ServerThread>("CreateAll", "90");
+            var hardStopCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("HardStop", "90");
+            Assert.NotNull(hardStopCommand);
+            var sender = IoC.Resolve<IActionSender>("SenderAdapterGetByID", "90");
+            var mre1 = new ManualResetEvent(false);
+            IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, new ActionCommand(() => { mre1.Set(); })).Execute();
+            var sendCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, hardStopCommand);
+            sendCommand.Execute();
+            mre1.WaitOne(200);
+            Assert.IsType<Boolean>(th6.QueueIsEmpty());
+            mre1.WaitOne(200);
+            Assert.IsType<Boolean>(th6.GetStop());
+        }
     }
 }
