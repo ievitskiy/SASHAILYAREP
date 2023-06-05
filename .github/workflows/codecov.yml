@@ -11,16 +11,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: 6.0.x
       - name: Install dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --no-restore /p:ContinuousIntegrationBuild=true
+        run: dotnet build --no-restore
       - name: Test
-        run: dotnet test --no-build --verbosity d -p:CollectCoverage=true -p:CoverletOutput=./coverage/coverage.opencover.xml -p:CoverletOutputFormat=opencover
+        run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --verbosity normal
       - name: Codecov
         uses: codecov/codecov-action@v3
         with:
