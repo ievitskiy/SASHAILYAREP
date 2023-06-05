@@ -1,4 +1,4 @@
-namespace SpaceBattle.Lib.Interfaces
+namespace SpaceBattle.Interfaces
 {
     public interface IUObject
     {

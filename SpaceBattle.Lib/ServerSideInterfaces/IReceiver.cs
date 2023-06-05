@@ -1,6 +1,6 @@
-namespace SpaceBattle.Lib.Interfaces
+namespace SpaceBattle.Interfaces
 {
-    public interface IReceiverAdapter
+    public interface IReceiver
     {
         public ICommand Receive();
         public bool IsEmpty();
