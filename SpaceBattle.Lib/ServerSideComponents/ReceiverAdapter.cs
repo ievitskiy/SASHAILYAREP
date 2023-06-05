@@ -5,12 +5,12 @@ namespace SpaceBattle.ServerSide
 {
     public class ReceiverAdapter: IReceiverAdapter
     {
-        BlockingCollection<IActionCommand> inputCommands;
-        public ReceiverAdapter(BlockingCollection<IActionCommand> inputCommands)
+        BlockingCollection<ICommand> inputCommands;
+        public ReceiverAdapter(BlockingCollection<ICommand> inputCommands)
         {
             this.inputCommands = inputCommands;
         }
-        public IActionCommand Receive()
+        public ICommand Receive()
         {
             return inputCommands.Take();
         }

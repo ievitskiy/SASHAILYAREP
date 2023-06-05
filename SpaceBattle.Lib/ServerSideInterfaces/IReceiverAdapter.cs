@@ -2,7 +2,7 @@ namespace SpaceBattle.Lib.Interfaces
 {
     public interface IReceiverAdapter
     {
-        public IActionCommand Receive();
+        public ICommand Receive();
         public bool IsEmpty();
     }
 }

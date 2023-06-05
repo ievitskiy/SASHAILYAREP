@@ -5,12 +5,12 @@ namespace SpaceBattle.ServerSide
 {
     public class SenderAdapter : IActionSender
     {
-        BlockingCollection<IActionCommand> queue;
-        public SenderAdapter(BlockingCollection<IActionCommand> queue)
+        BlockingCollection<ICommand> queue;
+        public SenderAdapter(BlockingCollection<ICommand> queue)
         {
             this.queue = queue;
         }
-        public void Push(IActionCommand command)
+        public void Push(ICommand command)
         {
             queue.Add(command);
         }

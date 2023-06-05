@@ -2,12 +2,12 @@ using SpaceBattle.Lib.Interfaces;
 
 namespace SpaceBattle.ServerSide
 {
-    public class CommandSender : IActionCommand
+    public class CommandSender : ICommand
     {
         private IActionSender sender;
-        private IActionCommand command;
+        private ICommand command;
 
-        public CommandSender(IActionSender sender, IActionCommand command)
+        public CommandSender(IActionSender sender, ICommand command)
         {
             this.sender = sender;
             this.command = command;

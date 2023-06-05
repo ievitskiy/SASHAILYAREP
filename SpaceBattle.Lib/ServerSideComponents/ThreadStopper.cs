@@ -2,7 +2,7 @@ using SpaceBattle.Lib.Interfaces;
 
 namespace SpaceBattle.ServerSide
 {
-    public class ThreadStopper : IActionCommand
+    public class ThreadStopper : ICommand
     {
         ServerThread stoppingThread;
         public ThreadStopper(ServerThread stoppingThread)

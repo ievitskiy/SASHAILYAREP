@@ -2,7 +2,7 @@ using SpaceBattle.Lib.Interfaces;
 
 namespace SpaceBattle.ServerSide
 {
-    public class ActionCommand : IActionCommand
+    public class ActionCommand : ICommand
     {
         private Action action;
 
