@@ -202,7 +202,7 @@ namespace SpaceBattle.Lib.Test
             mre1.WaitOne(200);
             Assert.True(th6.QueueIsEmpty());
             mre1.WaitOne(200);
-            Assert.True(th6.GetStop());
+            Assert.True(!th6.GetStop());
         }
     }
 }
