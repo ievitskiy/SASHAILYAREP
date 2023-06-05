@@ -178,6 +178,7 @@ namespace SpaceBattle.Lib.Test
             sendCommand.Execute();
             mre1.WaitOne(200);
             Assert.True(th10.QueueIsEmpty());
+            Assert.False(!th10.QueueIsEmpty());
             Assert.False(th10.GetStop());
             Assert.False(th8.GetStop());
         }
