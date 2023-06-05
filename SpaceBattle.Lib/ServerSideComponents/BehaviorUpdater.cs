@@ -1,12 +1,12 @@
-using ICommand = SpaceBattle.Interfaces.ICommand;
+using SpaceBattle.Lib.Interfaces;
 
-namespace SpaceBattle.Server
+namespace SpaceBattle.ServerSide
 {
     public class UpdateBehaviorCommand : ICommand
     {
-        MyThread updateBehaviorThread;
+        ServerThread updateBehaviorThread;
         Action action;
-        public UpdateBehaviorCommand(MyThread updateBehaviorThread, Action action)
+        public UpdateBehaviorCommand(ServerThread updateBehaviorThread, Action action)
         {
             this.updateBehaviorThread = updateBehaviorThread;
             this.action = action;

@@ -1,19 +1,21 @@
-using SpaceBattle.Interfaces;
-using ICommand = SpaceBattle.Interfaces.ICommand;
-namespace SpaceBattle.Server
+using SpaceBattle.Lib.Interfaces;
+
+namespace SpaceBattle.ServerSide
 {
-    public class SendCommand : ICommand
+    public class CommandSender : ICommand
     {
-        private ISender sndr;
-        private ICommand cmd;
-        public SendCommand(ISender sndr, ICommand cmd)
+        private IActionSender sender;
+        private ICommand command;
+
+        public CommandSender(IActionSender sender, ICommand command)
         {
-            this.sndr = sndr;
-            this.cmd = cmd;
+            this.sender = sender;
+            this.command = command;
         }
+
         public void Execute()
         {
-            sndr.Send(cmd);
+            sender.Push(command);
         }
     }
 }

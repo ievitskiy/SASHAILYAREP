@@ -1,5 +1,5 @@
-using SpaceBattle.Interfaces;
-using SpaceBattle.Server;
+using SpaceBattle.Lib.Interfaces;
+using SpaceBattle.ServerSide;
 using System.Collections.Concurrent;
 
 namespace SpaceBattle.ServerStrategies
@@ -13,7 +13,7 @@ namespace SpaceBattle.ServerStrategies
             {
                 commands.Append(new ActionCommand((Action)args[1]));
             }
-            IReceiver queue = new ReceiverAdapter(commands);
+            IReceiverAdapter queue = new ReceiverAdapter(commands);
             return queue;
         }
     }

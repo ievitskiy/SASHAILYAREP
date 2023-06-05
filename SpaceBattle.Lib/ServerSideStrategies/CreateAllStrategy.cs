@@ -1,8 +1,8 @@
 using Hwdtech;
-using SpaceBattle.Interfaces;
-using SpaceBattle.Server;
+using SpaceBattle.Lib.Interfaces;
+using SpaceBattle.ServerSide;
 using System.Collections.Concurrent;
-using ICommand = SpaceBattle.Interfaces.ICommand;
+using ICommand = SpaceBattle.Lib.Interfaces.ICommand;
 
 namespace SpaceBattle.ServerStrategies
 {
@@ -14,10 +14,10 @@ namespace SpaceBattle.ServerStrategies
             var sender = new SenderAdapter(que);
             if (args.Length > 1)
             {
-                sender.Send(new ActionCommand((Action)args[1]));
+                sender.Push(new ActionCommand((Action)args[1]));
             }
             var receiveradapter = IoC.Resolve<ReceiverAdapter>("CreateReceiverAdapter", que);
-            var MT = IoC.Resolve<MyThread>("CreateAndStartThread", (string)args[0], sender, receiveradapter);
+            var MT = IoC.Resolve<ServerThread>("CreateAndStartThread", (string)args[0], sender, receiveradapter);
             return MT;
         }
     }

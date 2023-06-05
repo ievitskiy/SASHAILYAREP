@@ -1,16 +1,16 @@
-using SpaceBattle.Interfaces;
+using SpaceBattle.Lib.Interfaces;
 using Hwdtech;
 
-namespace SpaceBattle.Server
+namespace SpaceBattle.ServerSide
 {
-    public class MyThread
+    public class ServerThread
     {
-        public MyThread(IReceiver queue)
+        public ServerThread(IReceiverAdapter queue)
         {
             this.queue = queue;
             strategy = new Action(() =>
             {
-                HandleCommand();
+                CommandHandler();
             });
             this.thread = new Thread(() =>
             {
@@ -21,7 +21,7 @@ namespace SpaceBattle.Server
             });
         }
         internal bool stop = false;
-        private IReceiver queue;
+        private IReceiverAdapter queue;
         private Thread thread;
         private Action strategy;
         public void Stop()
@@ -32,22 +32,22 @@ namespace SpaceBattle.Server
         {
             thread.Start();
         }
-        internal void HandleCommand()
+        internal void CommandHandler()
         {
-            SpaceBattle.Interfaces.ICommand cmd = this.queue.Receive();
+            SpaceBattle.Lib.Interfaces.ICommand command = this.queue.Receive();
             try
             {
-                cmd.Execute();
+                command.Execute();
             }
             catch (Exception e)
             {
-                var exceptionCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("HandleException", e, cmd);
+                var exceptionCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("HandleException", e, command);
                 exceptionCommand.Execute();
             }
         }
-        public void UpdateBehavior(Action newBeh)
+        public void UpdateBehavior(Action newBehavior)
         {
-            strategy = newBeh;
+            strategy = newBehavior;
         }
         public bool GetStop()
         {

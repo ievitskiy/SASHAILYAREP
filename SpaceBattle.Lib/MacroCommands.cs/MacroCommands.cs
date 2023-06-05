@@ -1,17 +1,17 @@
-using SpaceBattle.Interfaces;
+using SpaceBattle.Lib.Interfaces;
 namespace SpaceBattle.MacroCommand
 
 {
-    public class MacroCommands : Interfaces.ICommand
+    public class MacroCommands : Lib.Interfaces.ICommand
     {
-        IEnumerable<Interfaces.ICommand> commands;
-        public MacroCommands(IEnumerable<Interfaces.ICommand> commands)
+        IEnumerable<Lib.Interfaces.ICommand> commands;
+        public MacroCommands(IEnumerable<Lib.Interfaces.ICommand> commands)
         {
             this.commands = commands;
         }
         public void Execute()
         {
-            foreach (Interfaces.ICommand command in commands)
+            foreach (Lib.Interfaces.ICommand command in commands)
             {
                 command.Execute();
             }

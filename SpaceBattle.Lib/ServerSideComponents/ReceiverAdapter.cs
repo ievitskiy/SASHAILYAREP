@@ -1,22 +1,23 @@
-using SpaceBattle.Interfaces;
+using SpaceBattle.Lib.Interfaces;
 using System.Collections.Concurrent;
 
-namespace SpaceBattle.Server
+namespace SpaceBattle.ServerSide
 {
-    public class ReceiverAdapter : IReceiver
+    public class ReceiverAdapter: IReceiverAdapter
     {
-        BlockingCollection<ICommand> commands;
-        public ReceiverAdapter(BlockingCollection<ICommand> q)
+        BlockingCollection<ICommand> inputCommands;
+        public ReceiverAdapter(BlockingCollection<ICommand> inputCommands)
         {
-            this.commands = q;
+            this.inputCommands = inputCommands;
         }
         public ICommand Receive()
         {
-            return commands.Take();
+            return inputCommands.Take();
         }
+
         public bool IsEmpty()
         {
-            return commands.Count() == 0;
+            return inputCommands.Count() == 0;
         }
     }
 }
