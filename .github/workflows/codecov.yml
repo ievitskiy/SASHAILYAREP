@@ -34,5 +34,5 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
-          token: "952b8ee0-d389-4b1b-a14b-ff6a045f3dc6"
+          token: 952b8ee0-d389-4b1b-a14b-ff6a045f3dc6
           files: ./SpaceBattle.Lib.Test/TestResults/coverage.opencover.xml
