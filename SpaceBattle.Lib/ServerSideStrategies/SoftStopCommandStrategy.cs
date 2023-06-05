@@ -1,5 +1,6 @@
-using SpaceBattle.Lib.Interfaces;
-using SpaceBattle.ServerSide;
+using SpaceBattle.Interfaces;
+using SpaceBattle.MacroCommand;
+using SpaceBattle.Server;
 
 namespace SpaceBattle.ServerStrategies
 {
@@ -7,17 +8,17 @@ namespace SpaceBattle.ServerStrategies
     {
         public object StartStrategy(params object[] args)
         {
-            var MT = (ServerThread)args[0];
+            var MT = (MyThread)args[0];
             {
                 Action act = new Action(() =>
                 {
                     if (!MT.QueueIsEmpty())
                     {
-                        MT.CommandHandler();
+                        MT.HandleCommand();
                     }
                     else
                     {
-                        new ThreadStopper(MT).Execute();
+                        new ThreadStopCommand(MT).Execute();
                         if (args.Length > 1)
                         {
                             Action act1 = (Action)args[1];
@@ -25,7 +26,7 @@ namespace SpaceBattle.ServerStrategies
                         }
                     }
                 });
-                return new UpdateBehaviorCommand((ServerThread)args[0], act);
+                return new UpdateBehaviorCommand((MyThread)args[0], act);
             }
         }
     }

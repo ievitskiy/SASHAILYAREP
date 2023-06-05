@@ -1,5 +1,5 @@
-using SpaceBattle.Lib.Interfaces;
-using SpaceBattle.ServerSide;
+using SpaceBattle.Interfaces;
+using SpaceBattle.Server;
 
 namespace SpaceBattle.ServerStrategies
 {
@@ -7,7 +7,7 @@ namespace SpaceBattle.ServerStrategies
     {
         public object StartStrategy(params object[] args)
         {
-            var sendCommand = new CommandSender((IActionSender)args[0], (ICommand)args[1]);
+            var sendCommand = new SendCommand((ISender)args[0], (ICommand)args[1]);
             return sendCommand;
         }
     }
