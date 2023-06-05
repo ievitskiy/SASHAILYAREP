@@ -1,11 +1,11 @@
-using SpaceBattle.Lib.Interfaces;
+using ICommand = SpaceBattle.Interfaces.ICommand;
 
-namespace SpaceBattle.ServerSide
+namespace SpaceBattle.Server
 {
-    public class ThreadStopper : ICommand
+    public class ThreadStopCommand : ICommand
     {
-        ServerThread stoppingThread;
-        public ThreadStopper(ServerThread stoppingThread)
+        MyThread stoppingThread;
+        public ThreadStopCommand(MyThread stoppingThread)
         {
             this.stoppingThread = stoppingThread;
         }

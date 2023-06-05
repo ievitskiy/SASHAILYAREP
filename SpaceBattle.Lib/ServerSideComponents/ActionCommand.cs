@@ -1,16 +1,14 @@
-using SpaceBattle.Lib.Interfaces;
+using SpaceBattle.Interfaces;
 
-namespace SpaceBattle.ServerSide
+namespace SpaceBattle.Server
 {
     public class ActionCommand : ICommand
     {
         private Action action;
-
         public ActionCommand(Action action)
         {
             this.action = action;
         }
-
         public void Execute()
         {
             action();

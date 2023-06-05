@@ -1,16 +1,17 @@
-using SpaceBattle.Lib.Interfaces;
+using SpaceBattle.Interfaces;
 using System.Collections.Concurrent;
+using ICommand = SpaceBattle.Interfaces.ICommand;
 
-namespace SpaceBattle.ServerSide
+namespace SpaceBattle.Server
 {
-    public class SenderAdapter : IActionSender
+    public class SenderAdapter : ISender
     {
         BlockingCollection<ICommand> queue;
         public SenderAdapter(BlockingCollection<ICommand> queue)
         {
             this.queue = queue;
         }
-        public void Push(ICommand command)
+        public void Send(ICommand command)
         {
             queue.Add(command);
         }
