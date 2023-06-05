@@ -1,5 +1,5 @@
 using Hwdtech;
-using SpaceBattle.Lib.Interfaces;
+using SpaceBattle.Interfaces;
 
 namespace SpaceBattle.MacroCommand
 {
@@ -10,12 +10,12 @@ namespace SpaceBattle.MacroCommand
             var name = (string)args[0];
             var uObj = (IUObject)args[1];
             IEnumerable<string> names = IoC.Resolve<IEnumerable<string>>("Config.MacroCommand." + name);
-            IEnumerable<Lib.Interfaces.ICommand> commands = new List<Lib.Interfaces.ICommand>();
+            IEnumerable<Interfaces.ICommand> commands = new List<Interfaces.ICommand>();
             foreach (string command in names)
             {
-                commands.Append(IoC.Resolve<Lib.Interfaces.ICommand>(command, uObj));
+                commands.Append(IoC.Resolve<Interfaces.ICommand>(command, uObj));
             }
-            return IoC.Resolve<Lib.Interfaces.ICommand>("SimpleMacroCommand", commands);
+            return IoC.Resolve<Interfaces.ICommand>("SimpleMacroCommand", commands);
         }
     }
 }

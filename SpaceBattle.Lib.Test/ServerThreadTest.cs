@@ -1,8 +1,8 @@
 using Hwdtech.Ioc;
 using Hwdtech;
 using Moq;
-
-using SpaceBattle.ServerSide;
+using SpaceBattle.Interfaces;
+using SpaceBattle.Server;
 using SpaceBattle.ServerStrategies;
 using System.Collections.Concurrent;
 using ICommand = Hwdtech.ICommand;
@@ -17,8 +17,8 @@ namespace SpaceBattle.Lib.Test
             new InitScopeBasedIoCImplementationCommand().Execute();
             IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
 
-            var threadDict = new ConcurrentDictionary<string, ServerThread>();
-            var senderDict = new ConcurrentDictionary<string, SpaceBattle.Lib.Interfaces.IActionSender>();
+            var threadDict = new ConcurrentDictionary<string, MyThread>();
+            var senderDict = new ConcurrentDictionary<string, ISender>();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "ThreadIDMyThreadMapping", (object[] _) => threadDict).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "ThreadIDSenderMapping", (object[] _) => senderDict).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "SenderAdapterGetByID", (object[] id) => senderDict[(string)id[0]]).Execute();
@@ -44,12 +44,12 @@ namespace SpaceBattle.Lib.Test
         [Fact(Timeout = 1500)]
         public void MyThreadHardStopTest()
         {
-            var th3 = IoC.Resolve<ServerThread>("CreateAll", "83673");
+            var th3 = IoC.Resolve<MyThread>("CreateAll", "83673");
             var mre1 = new ManualResetEvent(false);
             Assert.True(th3.QueueIsEmpty());
-            var hardStopCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("HardStop", "83673", () => { mre1.Set(); });
-            var sender = IoC.Resolve<SpaceBattle.Lib.Interfaces.IActionSender>("SenderAdapterGetByID", "83673");
-            var sendCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, hardStopCommand);
+            var hardStopCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("HardStop", "83673", () => { mre1.Set(); });
+            var sender = IoC.Resolve<ISender>("SenderAdapterGetByID", "83673");
+            var sendCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, hardStopCommand);
             sendCommand.Execute();
             mre1.WaitOne(200);
             Assert.True(th3.QueueIsEmpty());
@@ -59,11 +59,11 @@ namespace SpaceBattle.Lib.Test
         public void MyThreadSoftStopTest()
         {
             var mre1 = new ManualResetEvent(false);
-            var th1 = IoC.Resolve<ServerThread>("CreateAll", "83674");
+            var th1 = IoC.Resolve<MyThread>("CreateAll", "83674");
             Assert.True(th1.QueueIsEmpty());
-            var softStopCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SoftStop", "83674", () => { mre1.Set(); });
-            var sender = IoC.Resolve<SpaceBattle.Lib.Interfaces.IActionSender>("SenderAdapterGetByID", "83674");
-            var sendCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, softStopCommand);
+            var softStopCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SoftStop", "83674", () => { mre1.Set(); });
+            var sender = IoC.Resolve<ISender>("SenderAdapterGetByID", "83674");
+            var sendCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, softStopCommand);
             sendCommand.Execute();
             mre1.WaitOne(200);
             Assert.True(th1.QueueIsEmpty());
@@ -72,40 +72,40 @@ namespace SpaceBattle.Lib.Test
         [Fact(Timeout = 1500)]
         public void MyThreadCreateTest()
         {
-            BlockingCollection<SpaceBattle.Lib.Interfaces.ICommand> que = new BlockingCollection<SpaceBattle.Lib.Interfaces.ICommand>(100);
+            BlockingCollection<SpaceBattle.Interfaces.ICommand> que = new BlockingCollection<SpaceBattle.Interfaces.ICommand>(100);
             var sender = new SenderAdapter(que);
-            var receiver = IoC.Resolve<SpaceBattle.Lib.Interfaces.IReceiverAdapter>("CreateReceiverAdapter", que);
-            var MT = IoC.Resolve<ServerThread>("CreateAndStartThread", "78", sender, receiver);
+            var receiver = IoC.Resolve<IReceiver>("CreateReceiverAdapter", que);
+            var MT = IoC.Resolve<MyThread>("CreateAndStartThread", "78", sender, receiver);
             Assert.True(MT.QueueIsEmpty());
             Assert.False(MT.GetStop());
-            Assert.NotNull(IoC.Resolve<ServerThread>("ServerThreadGetByID", "78"));
-            Assert.NotNull(IoC.Resolve<SpaceBattle.Lib.Interfaces.IActionSender>("SenderAdapterGetByID", "78"));
+            Assert.NotNull(IoC.Resolve<MyThread>("ServerThreadGetByID", "78"));
+            Assert.NotNull(IoC.Resolve<ISender>("SenderAdapterGetByID", "78"));
         }
         [Fact(Timeout = 1500)]
         public void MyThreadEqualsTrueTest()
         {
             var mre1 = new ManualResetEvent(false);
-            BlockingCollection<SpaceBattle.Lib.Interfaces.ICommand> que = new BlockingCollection<SpaceBattle.Lib.Interfaces.ICommand>(100);
+            BlockingCollection<SpaceBattle.Interfaces.ICommand> que = new BlockingCollection<SpaceBattle.Interfaces.ICommand>(100);
             var sender1 = new SenderAdapter(que);
-            var receiver1 = IoC.Resolve<SpaceBattle.Lib.Interfaces.IReceiverAdapter>("CreateReceiverAdapter", que, () => { mre1.Set(); });
-            var Th1 = IoC.Resolve<ServerThread>("CreateAndStartThread", "8367", sender1, receiver1);
-            Assert.True(Th1.Equals(IoC.Resolve<ServerThread>("ServerThreadGetByID", "8367")));
+            var receiver1 = IoC.Resolve<IReceiver>("CreateReceiverAdapter", que, () => { mre1.Set(); });
+            var Th1 = IoC.Resolve<MyThread>("CreateAndStartThread", "8367", sender1, receiver1);
+            Assert.True(Th1.Equals(IoC.Resolve<MyThread>("ServerThreadGetByID", "8367")));
             mre1.WaitOne(200);
 
         }
         [Fact(Timeout = 1500)]
         public void MyThreadEqualsFalseTest()
         {
-            var Th1 = IoC.Resolve<ServerThread>("CreateAll", "8367");
-            var Th2 = IoC.Resolve<ServerThread>("CreateAll", "8376");
-            Assert.True(Th1.Equals(IoC.Resolve<ServerThread>("ServerThreadGetByID", "8367")));
-            Assert.False(Th2.Equals(IoC.Resolve<ServerThread>("ServerThreadGetByID", "8367")));
+            var Th1 = IoC.Resolve<MyThread>("CreateAll", "8367");
+            var Th2 = IoC.Resolve<MyThread>("CreateAll", "8376");
+            Assert.True(Th1.Equals(IoC.Resolve<MyThread>("ServerThreadGetByID", "8367")));
+            Assert.False(Th2.Equals(IoC.Resolve<MyThread>("ServerThreadGetByID", "8367")));
         }
         [Fact(Timeout = 1500)]
         public void MyThreadHardStopTestWithException()
         {
             var command1 = new Mock<Interfaces.ICommand>();
-            var regStrategy1 = new Mock<SpaceBattle.Lib.Interfaces.IStrategy>();
+            var regStrategy1 = new Mock<IStrategy>();
             command1.Setup(_command => _command.Execute()).Verifiable();
             regStrategy1.Setup(_strategy => _strategy.StartStrategy(It.IsAny<object[]>())).Returns(command1.Object).Verifiable();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "HandleException", (object[] args) => regStrategy1.Object.StartStrategy(args)).Execute();
@@ -115,12 +115,12 @@ namespace SpaceBattle.Lib.Test
                 IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "HandleException", (object[] args) => regStrategy1.Object.StartStrategy(args)).Execute();
             };
 
-            var th3 = IoC.Resolve<ServerThread>("CreateAll", "83673", act1);
-            var th6 = IoC.Resolve<ServerThread>("CreateAll", "835", act1);
+            var th3 = IoC.Resolve<MyThread>("CreateAll", "83673", act1);
+            var th6 = IoC.Resolve<MyThread>("CreateAll", "835", act1);
             var mre1 = new ManualResetEvent(false);
-            var hardStopCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("HardStop", "835", () => { mre1.Set(); });
-            var sender = IoC.Resolve<SpaceBattle.Lib.Interfaces.IActionSender>("SenderAdapterGetByID", "83673");
-            var sendCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, hardStopCommand);
+            var hardStopCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("HardStop", "835", () => { mre1.Set(); });
+            var sender = IoC.Resolve<ISender>("SenderAdapterGetByID", "83673");
+            var sendCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, hardStopCommand);
 
             sendCommand.Execute();
             mre1.WaitOne(200);
@@ -141,17 +141,17 @@ namespace SpaceBattle.Lib.Test
             mockCommand2.Setup(_command => _command.Execute()).Verifiable();
 
             var mre1 = new ManualResetEvent(false);
-            var th1 = IoC.Resolve<ServerThread>("CreateAll", "83674");
+            var th1 = IoC.Resolve<MyThread>("CreateAll", "83674");
             Assert.True(th1.QueueIsEmpty());
-            var softStopCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SoftStop", "83674");
-            var sender = IoC.Resolve<SpaceBattle.Lib.Interfaces.IActionSender>("SenderAdapterGetByID", "83674");
-            IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, mockCommand1.Object).Execute();
-            IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, mockCommand2.Object).Execute();
-            var sendCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, softStopCommand);
+            var softStopCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SoftStop", "83674");
+            var sender = IoC.Resolve<ISender>("SenderAdapterGetByID", "83674");
+            IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, mockCommand1.Object).Execute();
+            IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, mockCommand2.Object).Execute();
+            var sendCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, softStopCommand);
             sendCommand.Execute();
-            IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, mockCommand3.Object).Execute();
-            IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, mockCommand4.Object).Execute();
-            IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, new ActionCommand(() => { mre1.Set(); })).Execute();
+            IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, mockCommand3.Object).Execute();
+            IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, mockCommand4.Object).Execute();
+            IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, new ActionCommand(() => { mre1.Set(); })).Execute();
             Assert.False(th1.QueueIsEmpty());
             mre1.WaitOne(200);
             mockCommand1.Verify();
@@ -165,7 +165,7 @@ namespace SpaceBattle.Lib.Test
         public void MyThreadSoftStopTestWithException()
         {
             var command1 = new Mock<Interfaces.ICommand>();
-            var regStrategy1 = new Mock<SpaceBattle.Lib.Interfaces.IStrategy>();
+            var regStrategy1 = new Mock<IStrategy>();
             command1.Setup(_command => _command.Execute()).Verifiable();
             regStrategy1.Setup(_strategy => _strategy.StartStrategy(It.IsAny<object[]>())).Returns(command1.Object).Verifiable();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "HandleException", (object[] args) => regStrategy1.Object.StartStrategy(args)).Execute();
@@ -175,12 +175,12 @@ namespace SpaceBattle.Lib.Test
                 IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "HandleException", (object[] args) => regStrategy1.Object.StartStrategy(args)).Execute();
             };
 
-            var th10 = IoC.Resolve<ServerThread>("CreateAll", "83673", act1);
-            var th8 = IoC.Resolve<ServerThread>("CreateAll", "835", act1);
+            var th10 = IoC.Resolve<MyThread>("CreateAll", "83673", act1);
+            var th8 = IoC.Resolve<MyThread>("CreateAll", "835", act1);
             var mre1 = new ManualResetEvent(false);
-            var softStopCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SoftStop", "835", () => { mre1.Set(); });
-            var sender = IoC.Resolve<SpaceBattle.Lib.Interfaces.IActionSender>("SenderAdapterGetByID", "83673");
-            var sendCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, softStopCommand);
+            var softStopCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SoftStop", "835", () => { mre1.Set(); });
+            var sender = IoC.Resolve<ISender>("SenderAdapterGetByID", "83673");
+            var sendCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, softStopCommand);
 
             sendCommand.Execute();
             mre1.WaitOne(200);
@@ -191,13 +191,13 @@ namespace SpaceBattle.Lib.Test
         [Fact(Timeout = 1500)]
         public void HardStopCommandWithoutAction()
         {
-            var th6 = IoC.Resolve<ServerThread>("CreateAll", "90");
-            var hardStopCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("HardStop", "90");
+            var th6 = IoC.Resolve<MyThread>("CreateAll", "90");
+            var hardStopCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("HardStop", "90");
             Assert.NotNull(hardStopCommand);
-            var sender = IoC.Resolve<SpaceBattle.Lib.Interfaces.IActionSender>("SenderAdapterGetByID", "90");
+            var sender = IoC.Resolve<ISender>("SenderAdapterGetByID", "90");
             var mre1 = new ManualResetEvent(false);
-            IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, new ActionCommand(() => { mre1.Set(); })).Execute();
-            var sendCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("SendCommand", sender, hardStopCommand);
+            IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, new ActionCommand(() => { mre1.Set(); })).Execute();
+            var sendCommand = IoC.Resolve<SpaceBattle.Interfaces.ICommand>("SendCommand", sender, hardStopCommand);
             sendCommand.Execute();
             mre1.WaitOne(200);
             Assert.True(th6.QueueIsEmpty());
