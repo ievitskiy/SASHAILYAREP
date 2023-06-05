@@ -1,6 +1,6 @@
 namespace SpaceBattle.Lib.Interfaces;
 
-public interface IActionCommand
+public interface ICommand
 {
     public void Execute();
 }

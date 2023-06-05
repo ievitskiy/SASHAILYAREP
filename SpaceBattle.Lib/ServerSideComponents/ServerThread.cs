@@ -34,14 +34,14 @@ namespace SpaceBattle.ServerSide
         }
         internal void CommandHandler()
         {
-            IActionCommand command = this.queue.Receive();
+            SpaceBattle.Lib.Interfaces.ICommand command = this.queue.Receive();
             try
             {
                 command.Execute();
             }
             catch (Exception e)
             {
-                var exceptionCommand = IoC.Resolve<IActionCommand>("HandleException", e, command);
+                var exceptionCommand = IoC.Resolve<SpaceBattle.Lib.Interfaces.ICommand>("HandleException", e, command);
                 exceptionCommand.Execute();
             }
         }
