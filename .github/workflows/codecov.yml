@@ -1,28 +1,38 @@
-name: dotnet package
- 
-on: [workflow_dispatch, pull_request]
- 
+name: .NET
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+      tags:
+        description: "Test scenario tags"
+
+  pull_request:
+    branches: ["master"]
+
 jobs:
   build:
- 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: ['6.0.x' ]
- 
+
     steps:
       - uses: actions/checkout@v3
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Install dependencies
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --no-restore /p:ContinuousIntegrationBuild=true
+        run: dotnet build --no-restore
       - name: Test
-        run: dotnet test --no-build --verbosity d -p:CollectCoverage=true -p:CoverletOutput=./coverage/coverage.opencover.xml -p:CoverletOutputFormat=opencover
-      - name: Codecov
+        run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --verbosity normal
+      - name: Find coverage file
+        run: find ./SpaceBattle.Lib.Test/TestResults -name "*.xml" -exec mv {} ./SpaceBattle.Lib.Test/TestResults/coverage.opencover.xml \;
+      - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-        with: 
-          files: SpaceBattle.Lib.Test/coverage/coverage.opencover.xml
+        with:
+          files: ./SpaceBattle.Lib.Test/TestResults/coverage.opencover.xml
+          token: c19d2189-9402-47a5-afb5-0c8084dbe2f0
