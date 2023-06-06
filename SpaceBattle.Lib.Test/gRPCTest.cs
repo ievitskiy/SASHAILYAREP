@@ -6,8 +6,6 @@ using SpaceBattle.gRPC;
 using Moq;
 using SpaceBattle.Lib.Interfaces;
 using SpaceBattle.ServerSide;
-using Grpc.Core;
-using Microsoft.Extensions.Logging;
 using SpaceBattle.gRPC.Services;
 using SpaceBattleGrpc.Others;
 namespace SpaceBattle.Lib.Test
@@ -70,7 +68,7 @@ namespace SpaceBattle.Lib.Test
                 return cmd.Object;
             }
             ).Execute();
-            
+
             var mre1 = new ManualResetEvent(false);
             var sender = IoC.Resolve<IActionSender>("SenderAdapterGetByID", "thread1");
         }
