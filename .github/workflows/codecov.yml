@@ -35,3 +35,4 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./SpaceBattle.Lib.Test/TestResults/coverage.opencover.xml
+          token: c19d2189-9402-47a5-afb5-0c8084dbe2f0
