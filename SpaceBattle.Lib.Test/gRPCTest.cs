@@ -72,7 +72,6 @@ namespace SpaceBattle.Lib.Test
             ).Execute();
             var mre1 = new ManualResetEvent(false);
             var sender = IoC.Resolve<IActionSender>("SenderAdapterGetByID", "thread1");
-            
         }
     }
 }
