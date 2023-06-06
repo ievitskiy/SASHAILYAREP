@@ -164,6 +164,7 @@ namespace SpaceBattle.Lib.Test
         [Fact(Timeout = 1500)]
         public void MyThreadSoftStopTestWithException()
         {
+            
             var command1 = new Mock<Interfaces.ICommand>();
             var regStrategy1 = new Mock<IStrategy>();
             command1.Setup(_command => _command.Execute()).Verifiable();
