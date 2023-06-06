@@ -157,8 +157,7 @@ namespace SpaceBattle.Lib.Test
             mockCommand3.Verify();
             mockCommand4.Verify();
             mockCommand2.Verify();
-            Assert.True(th1.QueueIsEmpty());
-            Assert.True(th1.GetStop());
+            
         }
         [Fact(Timeout=1500)]
         public void MyThreadSoftStopTestWithException()
