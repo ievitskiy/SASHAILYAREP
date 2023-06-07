@@ -3,7 +3,7 @@ using Hwdtech;
 
 public class CreateNewGameStrategy : IStrategy
 {
-    public object Execute(params object[] args)
+    public object RunStrategy(params object[] args)
     {   
         string gameId = (string) args[0];
 
