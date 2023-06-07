@@ -8,7 +8,7 @@ public class WorkWithGameTest
 {
     public WorkWithGameTest()
     {
-        new Hwdtech.Ioc.InitScopeBasedIoCImplementationCommand();
+        new Hwdtech.Ioc.InitScopeBasedIoCImplementationCommand().Execute();
         var scope = IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"));
         IoC.Resolve<ICommand>("Scopes.Current.Set", scope).Execute();
 
@@ -27,7 +27,7 @@ public class WorkWithGameTest
             { gameItemId, obj }
         };
 
-        var result = new GetGameObjectStrategy().Execute(objects, gameItemId);
+        var result = new GetGameObjectStrategy().RunStrategy(objects, gameItemId);
         Assert.Equal(obj, result);
 
         new DeleteGameObjectCommand(objects, gameItemId).Execute();
@@ -42,7 +42,7 @@ public class WorkWithGameTest
         new GameQueuePushCommand(commandQueueMock.Object, commandMock.Object).Execute();
         Assert.True(commandQueueMock.Object.Contains(commandMock.Object));
 
-        var command = new GameQueuePopStrategy().Execute(commandQueueMock.Object);
+        var command = new GameQueuePopStrategy().RunStrategy(commandQueueMock.Object);
         Assert.Equal(command, commandMock.Object);
     }
 }
